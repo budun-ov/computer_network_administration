@@ -1,0 +1,32 @@
+---
+- name: Создание, изменение и удаление файла на сервере
+  hosts: my_servers
+  become: yes
+  tasks:
+    - name: Создание текстового файла с исходным содержимым
+      shell: echo test_file_content > $HOME/test.txt
+      tags: create_file
+
+    - name: Проверка существования файла с правильным содержимым
+      shell: cat $HOME/test.txt
+      register: file_content
+      tags: check_file
+    - debug:
+        msg: "Содержимое файла: {{ file_content.stdout }}"
+
+    - name: Изменение содержимого файла
+      shell: echo new_content > $HOME/test.txt
+      tags: change_content
+
+    - name: Проверка измененного содержимого файла
+      shell: cat $HOME/test.txt
+      register: new_file_content
+      tags: check_new_content
+    - debug:
+        msg: "Новое содержимое файла: {{ new_file_content.stdout }}"
+
+    - name: Удаление файла
+      file:
+        path: $HOME/test.txt
+        state: absent
+      tags: remove_file
